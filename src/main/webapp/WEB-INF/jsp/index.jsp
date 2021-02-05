@@ -2,8 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="java.util.List" %>
 <%@ page import="com.test.board.boardproject.domain.Board" %>
+<%@ page import="sun.jvm.hotspot.debugger.Page" %>
+<%@ page import="com.test.board.boardproject.common.Pager" %>
 <%
-List<Board> boardList = (List)request.getAttribute("boardList");
+    List<Board> boardList = (List)request.getAttribute("boardList");
+
+    Pager pager = new Pager();
+    pager.init(request, boardList);
 %>
 
 <!DOCTYPE html>
@@ -79,10 +84,14 @@ List<Board> boardList = (List)request.getAttribute("boardList");
             <th>등록일</th>
             <th>조회수</th>
         </tr>
-        <%for(int i=0; i<boardList.size(); i++){%>
-        <% Board board = boardList.get(i); %>
+        <%int num = pager.getNum(); %>
+        <%int curPos = pager.getCurPos(); %>
+        <%for(int i=1; i<pager.getPageSize(); i++){%>
+        <%if(num<1) break; %>
+        <%if(pager.getNum()<1) break; %>
+        <% Board board = boardList.get(curPos++); %>
         <tr>
-            <td><%=board.getBoardid()%></td>
+            <td><%=num--%></td>
             <td><a href="/index/detailForm?boardid=<%=board.getBoardid()%>"><%=board.getTitle()%></a></td>
             <td><%=board.getWriter()%></td>
             <td><%=board.getContent()%></td>
@@ -90,6 +99,9 @@ List<Board> boardList = (List)request.getAttribute("boardList");
             <td><%=board.getHit()%></td>
         </tr>
         <%}%>
+        <tr>
+            <td colspan="5" style="text-align:center"></td>
+        </tr>
     </table>
     <form id="registForm">
         <input type="button" value="글등록" onclick="regist()">
